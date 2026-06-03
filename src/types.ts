@@ -28,6 +28,9 @@ export interface ApprovalInfo {
   status: string;
   /** Human-readable one-line summary of the request payload. */
   detail: string;
+  /** UI hint: whether the dashboard may resolve this one (host-set policy).
+   *  Pending rows without this stay view-only (resolve via chat). */
+  actionable?: boolean;
   session_id?: string | null;
   agent_group_id?: string | null;
   agent_group_name?: string | null;
@@ -170,4 +173,11 @@ export interface DashboardConfig {
    *  collisions with a proxy listening on the same port. */
   host?: string;
   secret?: string;
+  /** Optional write-back hook. When provided, the dashboard exposes
+   *  POST /api/approvals/<id> and the Approvals page renders action buttons.
+   *  The host owns all policy (which actions are allowed) and identity. */
+  onApprovalDecision?: (
+    id: string,
+    decision: 'approve' | 'reject',
+  ) => Promise<{ ok: boolean; error?: string }>;
 }
