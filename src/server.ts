@@ -6,7 +6,7 @@
 import http from 'http';
 
 import type { DashboardConfig, DashboardSnapshot } from './types.js';
-import { setSnapshot, addLogClient, removeLogClient, pushLogLines } from './store.js';
+import { setSnapshot, setApprovals, addLogClient, removeLogClient, pushLogLines } from './store.js';
 import { dispatch } from './router.js';
 
 const DEFAULT_PORT = 3100;
@@ -69,6 +69,13 @@ export function startDashboard(config: DashboardConfig = {}): void {
     // Log SSE stream — browser connects here
     if (path === '/api/logs' && method === 'GET') {
       handleLogStream(req, res);
+      return;
+    }
+
+    // Fast-path approvals refresh — POST /api/approvals/push { approvals: [...] }.
+    // Merges just the approvals slice (decoupled from the 60s full snapshot).
+    if (path === '/api/approvals/push' && method === 'POST') {
+      await handleApprovalsPush(req, res);
       return;
     }
 
@@ -148,6 +155,24 @@ async function handleLogPush(req: http.IncomingMessage, res: http.ServerResponse
     pushLogLines(lines);
     res.writeHead(200, { 'Content-Type': 'application/json' });
     res.end(JSON.stringify({ ok: true, count: lines.length }));
+  } catch {
+    res.writeHead(400, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ error: 'Invalid JSON' }));
+  }
+}
+
+async function handleApprovalsPush(req: http.IncomingMessage, res: http.ServerResponse): Promise<void> {
+  const chunks: Buffer[] = [];
+  for await (const chunk of req) {
+    chunks.push(chunk as Buffer);
+  }
+  try {
+    const { approvals } = JSON.parse(Buffer.concat(chunks).toString()) as {
+      approvals: DashboardSnapshot['approvals'];
+    };
+    setApprovals(approvals);
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ ok: true, count: approvals?.length ?? 0 }));
   } catch {
     res.writeHead(400, { 'Content-Type': 'application/json' });
     res.end(JSON.stringify({ error: 'Invalid JSON' }));

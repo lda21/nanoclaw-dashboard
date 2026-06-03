@@ -21,6 +21,16 @@ export function getLastUpdated(): string | null {
   return lastUpdated;
 }
 
+/** Merge just the approvals slice into the current snapshot (cheap fast-path
+ *  push, decoupled from the full 60s snapshot). No-op until a full snapshot
+ *  has arrived. */
+export function setApprovals(approvals: DashboardSnapshot['approvals']): void {
+  if (snapshot) {
+    snapshot.approvals = approvals;
+    lastUpdated = new Date().toISOString();
+  }
+}
+
 // --- Log streaming ---
 import type http from 'http';
 
