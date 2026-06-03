@@ -12,6 +12,7 @@ import { channelsPage } from './ui/pages/channels.js';
 import { messagesPage } from './ui/pages/messages.js';
 import { usersPage } from './ui/pages/users.js';
 import { logsPage } from './ui/pages/logs.js';
+import { approvalsPage } from './ui/pages/approvals.js';
 
 function json(res: http.ServerResponse, data: unknown, status = 200): void {
   res.writeHead(status, { 'Content-Type': 'application/json' });
@@ -128,6 +129,11 @@ export async function dispatch(
     return json(res, { sessions: s.context_windows });
   }
 
+  if (method === 'GET' && path === '/api/approvals') {
+    if (!s) return json(res, { error: 'No data yet' }, 503);
+    return json(res, s.approvals ?? []);
+  }
+
   // --- HTML pages ---
   if (method === 'GET') {
     if (path === '/dashboard') return html(res, overviewPage());
@@ -136,6 +142,7 @@ export async function dispatch(
     if (path === '/dashboard/channels') return html(res, channelsPage());
     if (path.startsWith('/dashboard/messages')) return html(res, messagesPage());
     if (path === '/dashboard/users') return html(res, usersPage());
+    if (path === '/dashboard/approvals') return html(res, approvalsPage());
     if (path === '/dashboard/logs') return html(res, logsPage());
     if (path === '/') {
       res.writeHead(302, { Location: '/dashboard' });

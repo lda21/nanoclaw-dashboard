@@ -11,6 +11,7 @@ const NAV_ITEMS = [
   { href: '/dashboard/channels', label: 'Channels', icon: '&#8644;' },
   { href: '/dashboard/messages', label: 'Messages', icon: '&#9993;' },
   { href: '/dashboard/users', label: 'Users', icon: '&#9679;' },
+  { href: '/dashboard/approvals', label: 'Approvals', icon: '&#10003;' },
   { href: '/dashboard/logs', label: 'Logs', icon: '&#9776;' },
 ];
 

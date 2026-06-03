@@ -17,6 +17,22 @@ export interface DashboardSnapshot {
   tokens: TokenSummary;
   context_windows: ContextWindowInfo[];
   activity: ActivityBucket[];
+  approvals?: ApprovalInfo[];
+}
+
+/** A pending (or recently-resolved) host-side approval request. */
+export interface ApprovalInfo {
+  approval_id: string;
+  action: string;
+  title: string;
+  status: string;
+  /** Human-readable one-line summary of the request payload. */
+  detail: string;
+  session_id?: string | null;
+  agent_group_id?: string | null;
+  agent_group_name?: string | null;
+  created_at: string;
+  expires_at?: string | null;
 }
 
 export interface AgentGroupInfo {
