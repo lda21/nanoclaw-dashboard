@@ -20,6 +20,7 @@ export function getDashboardSecret(): string | null {
 
 export function startDashboard(config: DashboardConfig = {}): void {
   const port = config.port || DEFAULT_PORT;
+  const host = config.host || '0.0.0.0';
   dashboardSecret = config.secret || null;
 
   if (!dashboardSecret) {
@@ -79,8 +80,8 @@ export function startDashboard(config: DashboardConfig = {}): void {
     }
   });
 
-  server.listen(port, '0.0.0.0', () => {
-    console.log(`[dashboard] Started on http://localhost:${port}/dashboard`);
+  server.listen(port, host, () => {
+    console.log(`[dashboard] Started on http://localhost:${port}/dashboard (bound ${host})`);
   });
 }
 

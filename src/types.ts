@@ -165,5 +165,9 @@ export interface ActivityBucket {
 
 export interface DashboardConfig {
   port?: number;
+  /** Interface to bind. Defaults to '0.0.0.0'. Set '127.0.0.1' to expose
+   *  only via a reverse proxy (e.g. Tailscale Serve) and avoid port
+   *  collisions with a proxy listening on the same port. */
+  host?: string;
   secret?: string;
 }
