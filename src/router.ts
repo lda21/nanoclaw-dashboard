@@ -130,8 +130,10 @@ export async function dispatch(
   }
 
   if (method === 'GET' && path === '/api/approvals') {
-    if (!s) return json(res, { error: 'No data yet' }, 503);
-    return json(res, s.approvals ?? []);
+    // Always returns an array. Before any snapshot has arrived `s` is null, so
+    // we fall through to `[]` rather than a 503 error object — the T4 UI and
+    // the fast-path pusher both consume a plain list.
+    return json(res, s?.approvals ?? []);
   }
 
   // --- HTML pages ---

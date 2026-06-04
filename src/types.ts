@@ -180,4 +180,12 @@ export interface DashboardConfig {
     id: string,
     decision: 'approve' | 'reject',
   ) => Promise<{ ok: boolean; error?: string }>;
+  /** Optional write-back hook: sync a channel's conversations into the host DB
+   *  (register newly discovered groups, refresh names). When provided, the
+   *  dashboard exposes POST /api/admin/channel-sync { channelType }. Returns
+   *  counts so the UI can say "registered N new groups". The host owns all
+   *  policy (which channels support sync). */
+  onChannelSync?: (
+    channelType: string,
+  ) => Promise<{ ok: boolean; registered?: number; updated?: number; error?: string }>;
 }
